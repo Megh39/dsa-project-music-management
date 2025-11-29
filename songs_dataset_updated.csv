@@ -1,0 +1,61 @@
+song_id,title,artist,album,genre,duration_sec,release_year
+S001,Midnight Chase,Neon Shore,Neon Nights,Alternative,190,2002
+S002,Blinding City,Midnight Avenue,Moonlight Drive,Pop,272,2010
+S003,Neon Dreams,Velvet Run,Digital Dreams,Rock,283,2002
+S004,Lost Horizon,Digital Bloom,Echo System,Pop,281,2016
+S005,Skyline Pulse,Starlit Drive,Eternal Waves,Alternative,276,2023
+S006,Echo Mirage,Digital Bloom,Skybound,Electronic,275,2015
+S007,Shadow Lights,Crimson Tide,Eternal Waves,Electronic,194,2002
+S008,Velvet Run,Digital Bloom,Midnight Circuit,Electronic,287,2004
+S009,Ocean Nights,Starlit Drive,Fireline,Indie,219,2013
+S010,Crimson Sky,Midnight Avenue,Skybound,Pop,184,2005
+S011,Electric Heart,Velvet Run,Midnight Circuit,Pop,280,2021
+S012,Silent Motion,Crimson Tide,Echo System,Indie,241,2001
+S013,Dream Circuit,Crimson Tide,Neon Nights,Indie,245,2002
+S014,Parallel Sun,Lunar Static,City Limits,Rock,253,2022
+S015,Glass Echoes,Aurora Code,Midnight Circuit,Electronic,191,2003
+S016,Golden Drift,Neon Shore,Eternal Waves,Pop,199,2023
+S017,Starline,Crimson Tide,Echo System,Electronic,294,2023
+S018,Fireborne,Neon Shore,Neon Nights,Pop,174,2013
+S019,Gravity Love,Crimson Tide,Skybound,Electronic,161,2021
+S020,Infinite Loop,Digital Bloom,Echo System,Pop,183,2019
+S021,Moonlight Frequency,Starlit Drive,Fireline,Electronic,198,2003
+S022,Digital Mind,Lunar Static,Eternal Waves,Rock,298,2002
+S023,Forgotten Flame,Lunar Static,City Limits,Pop,298,2016
+S024,Beyond the Wire,Lunar Static,Moonlight Drive,Pop,297,2023
+S025,Hollow Tone,Echo Wave,Midnight Circuit,Pop,216,2012
+S026,Dark Cascade,Velvet Run,Echo System,Electronic,165,2001
+S027,Wired Soul,Lunar Static,Midnight Circuit,Alternative,156,2002
+S028,Silver Highway,Lunar Static,Skybound,Rock,160,2005
+S029,Fractal Heart,Velvet Run,Echo System,Alternative,193,2016
+S030,Nocturnal Path,Aurora Code,Digital Dreams,Rock,257,2011
+S031,Hidden Frame,Echo Wave,Midnight Circuit,Pop,179,2005
+S032,Static Bloom,Digital Bloom,Midnight Circuit,Electronic,224,2007
+S033,Urban Mirage,Crimson Tide,Skybound,Electronic,233,2008
+S034,Eternal Signal,Lunar Static,City Limits,Alternative,269,2012
+S035,Black Horizon,Digital Bloom,Neon Nights,Pop,198,2017
+S036,Cold Fire,Neon Shore,Fireline,Alternative,156,2012
+S037,Pulse Vector,Echo Wave,Echo System,Alternative,244,2018
+S038,Emerald Glow,Neon Shore,City Limits,Pop,173,2012
+S039,Reverie Field,Digital Bloom,City Limits,Rock,232,2004
+S040,Solar Drift,Lunar Static,Echo System,Pop,207,2007
+S041,Binary Soul,Velvet Run,Midnight Circuit,Pop,228,2007
+S042,Lunar Flow,Neon Shore,Midnight Circuit,Electronic,199,2016
+S043,Magnetic Rush,Midnight Avenue,Skybound,Indie,159,2011
+S044,Amber Circuit,Echo Wave,Eternal Waves,Pop,272,2002
+S045,Crystal Code,Neon Shore,Echo System,Alternative,242,2017
+S046,Zero Phase,Aurora Code,Echo System,Pop,235,2010
+S047,Sapphire Echo,Neon Shore,Moonlight Drive,Rock,210,2014
+S048,Iron Silence,Echo Wave,Fractal Light,Pop,194,2021
+S049,Dream Surge,Midnight Avenue,Fractal Light,Alternative,253,2003
+S050,Chasing Static,Starlit Drive,Digital Dreams,Alternative,207,2022
+S051,Mosaic Heart,Crimson Tide,Fractal Light,Electronic,215,2010
+S052,Digital Horizon,Midnight Avenue,City Limits,Rock,180,2016
+S053,Firefall,Digital Bloom,Moonlight Drive,Alternative,290,2008
+S054,Echo Divide,Echo Wave,Skybound,Rock,223,2010
+S055,Neural Light,Midnight Avenue,Echo System,Rock,256,2007
+S056,Celestial Bloom,The Parallel,Eternal Waves,Alternative,273,2021
+S057,Amberline,Aurora Code,Echo System,Alternative,299,2023
+S058,Last Broadcast,Starlit Drive,Echo System,Rock,297,2001
+S059,Solar Drift II,Lunar Static,Fractal Light,Electronic,282,2005
+S060,Frozen Memory,Digital Bloom,Eternal Waves,Pop,231,2023

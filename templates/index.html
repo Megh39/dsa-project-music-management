@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Music DSA System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e5e7eb;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #020617;
+            padding: 20px;
+            border-right: 1px solid #1f2937;
+        }
+
+        .sidebar h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #f97316;
+        }
+
+        .nav-section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            margin-bottom: 8px;
+            background-color: #093595;
+            color: #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background-color: #f97316;
+            color: #111827;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 25px;
+        }
+
+        .card {
+            background-color: #020617;
+            border: 1px solid #1f2937;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #f97316;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 7px 8px;
+            border-radius: 4px;
+            border: 1px solid #374151;
+            background-color: #020617;
+            color: #e5e7eb;
+        }
+
+        .btn-row {
+            margin-top: 8px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #f97316;
+            color: #111827;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #e5e7eb;
+            border: 1px solid #4b5563;
+        }
+
+        .output {
+            margin-top: 12px;
+            white-space: pre-wrap;
+            background-color: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            min-height: 40px;
+            border: 1px dashed #374151;
+            font-size: 13px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1>Music DSA System</h1>
+            <p class="nav-section-title">Sections</p>
+
+            <button class="nav-btn {% if active_section=='library-section' %}active{% endif %}"
+                data-target="library-section">
+                Library (Hash Table)
+            </button>
+
+            <button class="nav-btn {% if active_section=='playlist-section' %}active{% endif %}"
+                data-target="playlist-section">Playlist</button>
+
+                <button class="nav-btn {% if active_section=='queue-section' %}active{% endif %}"
+                    data-target="queue-section">Queue</button>
+
+                    <button class="nav-btn {% if active_section=='history-section' %}active{% endif %}"
+                        data-target="history-section">Stack</button>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main">
+
+            <!-- ================= LIBRARY SECTION ================= -->
+            <section id="library-section" class="section {% if active_section=='library-section' %}active{% endif %}">
+
+                <div class="section-header">
+                    <h2>Song Library (Hash Table)</h2>
+                    <p>Search and delete songs stored in the HashTable.</p>
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>Search / Delete</h3>
+
+                        <form method="POST" action="/library">
+                            <div class="form-group">
+                                <label>Song ID</label>
+                                <input type="text" name="song_id" placeholder="Search by ID or Title">
+
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn btn-primary" name="action" value="search">Search</button>
+                                <button class="btn btn-outline" name="action" value="delete">Delete</button>
+                            </div>
+                        </form>
+
+                        <div class="output">{{ library_output }}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Display Hash Table</h3>
+
+                        <form method="POST" action="/library/display">
+                            <button class="btn btn-outline">Show Buckets</button>
+                        </form>
+
+                        <div class="output">{{ library_output }}</div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ================= PLAYLIST SECTION ================= -->
+            <section id="playlist-section" class="section {% if active_section=='playlist-section' %}active{% endif %}">
+
+                <div class="section-header">
+                    <h2>Playlist Manager (Linked List)</h2>
+                    <p>Insert, delete or search songs in your playlist.</p>
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>Modify Playlist</h3>
+
+                        <form method="POST" action="/playlist">
+                            <div class="form-group">
+                                <label>Song ID</label>
+                                <input type="text" name="song_id" placeholder="e.g. S021">
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn btn-primary" name="action" value="add_start">Add at Start</button>
+                                <button class="btn btn-outline" name="action" value="add_end">Add at End</button>
+                                <button class="btn btn-outline" name="action" value="delete">Delete Song</button>
+                            </div>
+                        </form>
+
+                        <div class="output">{{ playlist_output }}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Playlist View</h3>
+
+                        <form method="POST" action="/playlist/display">
+                            <button class="btn btn-outline">Refresh Playlist</button>
+                        </form>
+
+                        <div class="output">{{ playlist_output }}</div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ================= QUEUE SECTION ================= -->
+            <section id="queue-section" class="section {% if active_section=='queue-section' %}active{% endif %}">
+
+                <div class="section-header">
+                    <h2>Playback Queue (Queue)</h2>
+                    <p>Manage upcoming songs.</p>
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>Queue Controls</h3>
+
+                        <form method="POST" action="/queue">
+                            <div class="form-group">
+                                <label>Song ID</label>
+                                <input type="text" name="song_id" placeholder="e.g. S010">
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn btn-primary" name="action" value="enqueue">Enqueue</button>
+                                <button class="btn btn-outline" name="action" value="dequeue">Play Next</button>
+                                <button class="btn btn-outline" name="action" value="peek">Peek</button>
+                            </div>
+                        </form>
+
+                        <div class="output">{{ queue_output }}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Current Queue</h3>
+
+                        <form method="POST" action="/queue/display">
+                            <button class="btn btn-outline">Refresh Queue</button>
+                        </form>
+
+                        <div class="output">{{ queue_output }}</div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ================= HISTORY SECTION ================= -->
+            <section id="history-section" class="section {% if active_section=='history-section' %}active{% endif %}">
+
+                <div class="section-header">
+                    <h2>Recently Played (Stack)</h2>
+                    <p>Undo last play or inspect play history.</p>
+                </div>
+
+                <div class="grid">
+
+                    <div class="card">
+                        <h3>History Controls</h3>
+
+                        <form method="POST" action="/history">
+                            <div class="btn-row">
+                                <button class="btn btn-primary" name="action" value="undo">Undo Last Play</button>
+                                <button class="btn btn-outline" name="action" value="clear">Clear History</button>
+                            </div>
+                        </form>
+
+                        <div class="output">{{ history_output }}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>History View</h3>
+
+                        <form method="POST" action="/history/display">
+                            <button class="btn btn-outline">Refresh History</button>
+                        </form>
+
+                        <div class="output">{{ history_output }}</div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- Section Switching Script -->
+    <script>
+        const buttons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                sections.forEach(sec => sec.classList.remove('active'));
+                document.getElementById(btn.dataset.target).classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+
+</html>
