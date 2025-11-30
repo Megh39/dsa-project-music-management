@@ -206,8 +206,9 @@
 
                         <form method="POST" action="/library">
                             <div class="form-group">
-                                <label>Song ID</label>
-                                <input type="text" name="song_id" placeholder="Search by ID or Title">
+                                <label>Song ID/Title</label>
+                                <input type="text" name="song_id" value="{{ library_last_query }}"
+                                    placeholder="Search by ID or Title">
 
                             </div>
 
@@ -217,7 +218,7 @@
                             </div>
                         </form>
 
-                        <div class="output">{{ library_output }}</div>
+                        <div class="output">{{ library_output_search }}</div>
                     </div>
 
                     <div class="card">
@@ -227,11 +228,20 @@
                             <button class="btn btn-outline">Show Buckets</button>
                         </form>
 
-                        <div class="output">{{ library_output }}</div>
+                        <div class="output">{{ library_output_buckets }}</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Show All Songs</h3>
+                        <form method="POST" action="/library/all">
+                            <button class="btn btn-outline">Show Songs</button>
+                        </form>
+                        <div class="output">{{ library_output_all }}</div>
                     </div>
 
                 </div>
             </section>
+
 
 
             <!-- ================= PLAYLIST SECTION ================= -->
@@ -250,7 +260,9 @@
                         <form method="POST" action="/playlist">
                             <div class="form-group">
                                 <label>Song ID</label>
-                                <input type="text" name="song_id" placeholder="e.g. S021">
+                                <input type="text" name="song_id" value="{{ playlist_last_song }}"
+                                    placeholder="e.g. S021">
+
                             </div>
 
                             <div class="btn-row">
@@ -268,26 +280,29 @@
                         <form method="POST" action="/playlist">
                             <div class="form-group">
                                 <label>New Song ID</label>
-                                <input type="text" name="song_id" placeholder="Song to insert">
+                                <input type="text" name="song_id" value="{{ playlist_insert_new }}"
+                                    placeholder="Song to insert">
                             </div>
 
                             <div class="form-group">
                                 <label>Target Song ID</label>
-                                <input type="text" name="target_id" placeholder="Insert after this">
+                                <input type="text" name="target_id" value="{{ playlist_insert_target }}"
+                                    placeholder="Insert after this">
                             </div>
 
                             <button class="btn btn-primary" name="action" value="insert_after">Insert After</button>
                         </form>
-
-                        <!-- <div class="output">{{ playlist_output }}</div> -->
                     </div>
+
                     <div class="card">
                         <h3>Reorder Playlist</h3>
 
                         <form method="POST" action="/playlist">
                             <div class="form-group">
                                 <label>Song ID</label>
-                                <input type="text" name="song_id" placeholder="Song to reorder">
+                                <input type="text" name="song_id" value="{{ playlist_reorder_song }}"
+                                    placeholder="Song to reorder">
+
                             </div>
 
                             <div class="btn-row">
@@ -332,7 +347,8 @@
                         <form method="POST" action="/queue">
                             <div class="form-group">
                                 <label>Song ID</label>
-                                <input type="text" name="song_id" placeholder="e.g. S010">
+                                <input type="text" name="song_id" value="{{ queue_last_song }}" placeholder="e.g. S010">
+
                             </div>
 
                             <div class="btn-row">
@@ -344,7 +360,7 @@
                             </div>
                         </form>
 
-                        <div class="output">{{ queue_output }}</div>
+                        <div class="output">{{ queue_output_display }}</div>
                     </div>
 
                     <div class="card">
@@ -355,6 +371,7 @@
                         </form>
 
                         <div class="output">{{ queue_output }}</div>
+
                     </div>
 
                 </div>

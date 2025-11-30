@@ -1,6 +1,8 @@
 # %%
 import csv
-from flask import Flask,render_template,request
+from flask import Flask, render_template, request
+
+
 # ----------------------------------------------------
 # SONG CLASS
 # ----------------------------------------------------
@@ -18,8 +20,8 @@ class Song:
         return f"[{self.song_id}] {self.title} by {self.artist} ({self.album}, {self.year}) - {self.genre}, {self.duration}s"
 
 
-
 # %%
+
 
 # ----------------------------------------------------
 # HASH TABLE FOR SONG LIBRARY
@@ -39,7 +41,7 @@ class HashTable:
     def _hash(self, key):
         h = 5381
         for c in key:
-            h = ((h << 5) + h) + ord(c)
+            h = h * 33 + ord(c)
         return h % self.size
 
     def insert(self, key, value):
@@ -67,24 +69,31 @@ class HashTable:
                 return node.value
             node = node.next
         return None
+
     def search_by_title(self, title):
+        title = title.strip().lower()
         matches = []
+
         for bucket in self.table:
             node = bucket
             while node:
-                if node.value.title.lower() == title.lower():
+                if node.value.title.strip().lower() == title:
                     matches.append(node.value)
                 node = node.next
+
         return matches
+
     def search_by_partial_title(self, partial):
+        partial = partial.strip().lower()
         matches = []
-        partial = partial.lower()
+
         for bucket in self.table:
             node = bucket
             while node:
                 if partial in node.value.title.lower():
                     matches.append(node.value)
                 node = node.next
+
         return matches
 
     def delete(self, key):
@@ -103,16 +112,27 @@ class HashTable:
 
         return False
 
+    def display_all_songs(self):
+        out = []
+        for bucket in self.table:
+            node = bucket
+            while node:
+                out.append(str(node.value))
+                node = node.next
+        return "\n".join(out) if out else "Library is empty."
+
     def display(self):
+        out = []
         for i in range(self.size):
             node = self.table[i]
             if node:
-                print(f"Bucket {i}: ", end="")
                 chain = []
-                while node:
-                    chain.append(node.key)
-                    node = node.next
-                print(" -> ".join(chain))
+                temp = node
+                while temp:
+                    chain.append(temp.key)
+                    temp = temp.next
+                out.append(f"Bucket {i}: " + " -> ".join(chain))
+        return "\n".join(out) if out else "Hash table is empty."
 
 
 # %%
@@ -173,6 +193,7 @@ class LinkedList:
                 return current.song
             current = current.next
         return None
+
     def search_by_title(self, title):
         title = title.lower()
         current = self.head
@@ -201,12 +222,13 @@ class LinkedList:
         if not self.head:
             print("Playlist is empty.")
             return
-        out=[]
+        out = []
         current = self.head
         while current:
             out.append(str(current.song))
             current = current.next
         return "\n".join(out)
+
     def insert_after(self, target_id, song):
         current = self.head
         while current and current.song.song_id != target_id:
@@ -221,6 +243,7 @@ class LinkedList:
         current.next = new_node
         print(f"Inserted {song.title} after {current.song.title}")
         return True
+
     def move_up(self, song_id):
         if not self.head or not self.head.next:
             return False
@@ -245,6 +268,7 @@ class LinkedList:
             self.head = curr
 
         return True
+
     def move_down(self, song_id):
         curr = self.head
         prev = None
@@ -266,6 +290,7 @@ class LinkedList:
             self.head = nxt
 
         return True
+
     def reverse(self):
         prev = None
         current = self.head
@@ -280,6 +305,7 @@ class LinkedList:
 
 
 # %%
+
 
 # ----------------------------------------------------
 # QUEUE FOR PLAYBACK
@@ -312,20 +338,25 @@ class Queue:
             out.append(f"{i}. {song.title} by {song.artist}")
 
         return "\n".join(out)
+
     def find_song_for_queue(text):
         # ID
         s = library.search(text)
-        if s: return s
+        if s:
+            return s
 
         # full title
         exact = library.search_by_title(text)
-        if exact: return exact[0]
+        if exact:
+            return exact[0]
 
         # partial
         partial = library.search_by_partial_title(text)
-        if partial: return partial[0]
+        if partial:
+            return partial[0]
 
         return None
+
     def replay(self, stack):
         song = stack.pop()
         if not song:
@@ -333,7 +364,7 @@ class Queue:
 
         self.enqueue(song)
         return f"Replaying: {song.title}"
-    
+
 
 # %%
 
@@ -353,6 +384,7 @@ class Stack:
             print("No recently played songs.")
             return None
         return self.items.pop()
+
     def display_list(self):
         if not self.items:
             return "No recently played songs."
@@ -365,18 +397,17 @@ class Stack:
         print("Recently Played:")
         for song in reversed(self.items):
             print(song)
-    
-
 
 
 # %%
+
 
 # ----------------------------------------------------
 # LOAD SONGS FROM CSV
 # ----------------------------------------------------
 def load_songs(filename):
     songs = []
-    with open(filename, newline='', encoding='utf-8') as f:
+    with open(filename, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             song = Song(
@@ -386,11 +417,10 @@ def load_songs(filename):
                 row["album"],
                 row["genre"],
                 int(row["duration_sec"]),
-                int(row["release_year"])
+                int(row["release_year"]),
             )
             songs.append(song)
     return songs
-
 
 
 songs = load_songs("songs_dataset_updated.csv")
@@ -408,75 +438,91 @@ for s in songs:
 # ----------------------------------------------------
 # FLASK APP
 # ----------------------------------------------------
+# ----------------------------------------------------
+# FLASK APP
+# ----------------------------------------------------
 app = Flask(__name__)
+
 
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
+
+
 # ---------------------- LIBRARY ----------------------
 @app.route("/library", methods=["POST"])
 def library_action():
-    song_id = request.form.get("song_id")
+    song_id = request.form.get("song_id", "").strip()
     action = request.form.get("action")
 
-    # ---------------- SEARCH ----------------
+    # SEARCH
     if action == "search":
-        q = song_id.strip()
+        q = song_id.lower()
 
-        # 1. try exact ID
-        by_id = library.search(q)
+        # 1 ID match
+        by_id = library.search(song_id.upper())
         if by_id:
             return render_template(
                 "index.html",
-                library_output=str(by_id),
-                active_section="library-section"
+                active_section="library-section",
+                library_last_query=song_id,
+                library_output_search=str(by_id),
             )
 
-        # 2. try full title match
+        # 2 exact title
         by_title = library.search_by_title(q)
         if by_title:
-            out = "\n".join(str(s) for s in by_title)
             return render_template(
                 "index.html",
-                library_output=out,
-                active_section="library-section"
+                active_section="library-section",
+                library_last_query=song_id,
+                library_output_search="\n".join(str(s) for s in by_title),
             )
 
-        # 3. try partial title
+        # 3 partial title
         by_partial = library.search_by_partial_title(q)
         if by_partial:
-            out = "\n".join(str(s) for s in by_partial)
             return render_template(
                 "index.html",
-                library_output=out,
-                active_section="library-section"
+                active_section="library-section",
+                library_last_query=song_id,
+                library_output_search="\n".join(str(s) for s in by_partial),
             )
 
         return render_template(
             "index.html",
-            library_output="No match found.",
-            active_section="library-section"
+            active_section="library-section",
+            library_last_query=song_id,
+            library_output_search="No match found.",
         )
 
-    # ---------------- DELETE ----------------
-    elif action == "delete":
+    # DELETE
+    if action == "delete":
         ok = library.delete(song_id)
         return render_template(
             "index.html",
-            library_output="Deleted." if ok else "Not found.",
-            active_section="library-section"
+            active_section="library-section",
+            library_last_query=song_id,
+            library_output_search="Deleted." if ok else "Not found.",
         )
 
 
 @app.route("/library/display", methods=["POST"])
 def library_display():
-    output = library.display()
     return render_template(
         "index.html",
-        library_output=output,
-        active_section="library-section"
+        active_section="library-section",
+        library_output_buckets=library.display(),
     )
 
+
+@app.route("/library/all", methods=["POST"])
+def library_all():
+    return render_template(
+        "index.html",
+        active_section="library-section",
+        library_output_all=library.display_all_songs(),
+    )
 
 
 # ---------------------- PLAYLIST ----------------------
@@ -485,23 +531,27 @@ def playlist_action():
     action = request.form.get("action")
     song_id = request.form.get("song_id")
 
-    # reverse does NOT need a song
+    # reverse does NOT need song_id
     if action == "reverse":
         playlist.reverse()
         return render_template(
             "index.html",
+            active_section="playlist-section",
             playlist_output="Playlist reversed.",
-            active_section="playlist-section"
+            playlist_reorder_song=None,
         )
 
-    # insert_after needs TWO IDs
+    # INSERT AFTER
     if action == "insert_after":
         target_id = request.form.get("target_id")
+
         if not song_id or not target_id:
             return render_template(
                 "index.html",
+                active_section="playlist-section",
                 playlist_output="Both song_id and target_id required.",
-                active_section="playlist-section"
+                playlist_insert_new=song_id,
+                playlist_insert_target=target_id,
             )
 
         song = library.search(song_id)
@@ -510,49 +560,63 @@ def playlist_action():
         if not song or not target_song:
             return render_template(
                 "index.html",
+                active_section="playlist-section",
                 playlist_output="Song or target not found in library.",
-                active_section="playlist-section"
+                playlist_insert_new=song_id,
+                playlist_insert_target=target_id,
             )
 
         playlist.insert_after(target_id, song)
+
         return render_template(
             "index.html",
+            active_section="playlist-section",
             playlist_output=f"Inserted {song.title} after {target_song.title}",
-            active_section="playlist-section"
+            playlist_insert_new=song_id,
+            playlist_insert_target=target_id,
         )
 
-    # move_up and move_down need only song_id
+    # MOVE UP / MOVE DOWN
     if action in ["move_up", "move_down"]:
         if not song_id:
             return render_template(
                 "index.html",
+                active_section="playlist-section",
                 playlist_output="Song ID required.",
-                active_section="playlist-section"
+                playlist_reorder_song=song_id,
             )
 
-        ok = playlist.move_up(song_id) if action == "move_up" else playlist.move_down(song_id)
+        ok = (
+            playlist.move_up(song_id)
+            if action == "move_up"
+            else playlist.move_down(song_id)
+        )
 
         return render_template(
             "index.html",
+            active_section="playlist-section",
             playlist_output="Success." if ok else "Cannot move.",
-            active_section="playlist-section"
+            playlist_reorder_song=song_id,
         )
 
-    # add_start, add_end, delete need song validation
+    # ADD_START / ADD_END / DELETE
     if action in ["add_start", "add_end", "delete"]:
         if not song_id:
             return render_template(
                 "index.html",
+                active_section="playlist-section",
                 playlist_output="Song ID required.",
-                active_section="playlist-section"
+                playlist_modify_song=song_id,
             )
 
         song = library.search(song_id)
+
         if not song and action != "delete":
             return render_template(
                 "index.html",
+                active_section="playlist-section",
                 playlist_output="Song not found in library.",
-                active_section="playlist-section"
+                playlist_modify_song=song_id,
             )
 
         if action == "add_start":
@@ -563,43 +627,37 @@ def playlist_action():
             playlist.insert_at_end(song)
             msg = "Inserted at end."
 
-        elif action == "delete":
+        else:  # delete
             removed = playlist.delete_song(song_id)
             msg = "Deleted." if removed else "Song not found."
 
         return render_template(
             "index.html",
+            active_section="playlist-section",
             playlist_output=msg,
-            active_section="playlist-section"
+            playlist_modify_song=song_id,
         )
-
 
 
 @app.route("/playlist/display", methods=["POST"])
 def playlist_display():
     return render_template(
-    "index.html",
-    playlist_output=playlist.display(),
-    active_section="playlist-section"
-)
-
-
+        "index.html",
+        active_section="playlist-section",
+        playlist_output=playlist.display(),
+    )
 
 
 # ---------------------- QUEUE ----------------------
 def find_song(text):
-    # id match
-    s = library.search(text)
-    if s:
-        return s
+    if library.search(text):
+        return library.search(text)
 
-    # exact title
-    t = library.search_by_title(text)
+    t = library.search_by_title(text.lower())
     if t:
         return t[0]
 
-    # partial title
-    p = library.search_by_partial_title(text)
+    p = library.search_by_partial_title(text.lower())
     if p:
         return p[0]
 
@@ -607,62 +665,64 @@ def find_song(text):
 
 @app.route("/queue", methods=["POST"])
 def queue_action():
-    song_id = request.form.get("song_id")
     action = request.form.get("action")
+    song_id = request.form.get("song_id", "").strip()
 
-    # -------- ENQUEUE --------
+    args = {
+        "active_section": "queue-section",
+        "queue_last_song": song_id,
+        "queue_output_display": "",       # LEFT CARD
+        "queue_output": queue.display(),  # RIGHT CARD
+    }
+
+    # ENQUEUE
     if action == "enqueue":
         song = find_song(song_id)
         if not song:
-            return render_template(
-                "index.html",
-                queue_output="Song not found.",
-                active_section="queue-section"
-            )
-        msg = queue.enqueue(song)
-        return render_template(
-            "index.html",
-            queue_output=msg,
-            active_section="queue-section"
-        )
+            args["queue_output_display"] = "Song not found."
+            return render_template("index.html", **args)
 
-    # -------- DEQUEUE / PLAY NEXT --------
-    elif action == "dequeue":
+        args["queue_output_display"] = queue.enqueue(song)
+        args["queue_output"] = queue.display()
+        return render_template("index.html", **args)
+
+    # DEQUEUE
+    if action == "dequeue":
         msg, song = queue.dequeue()
         if song:
             history.push(song)
-        return render_template(
-            "index.html",
-            queue_output=msg,
-            active_section="queue-section"
-        )
 
-    # -------- PEEK --------
-    elif action == "peek":
+        args["queue_output_display"] = msg
+        args["queue_output"] = queue.display()
+        args["queue_last_song"] = ""
+        return render_template("index.html", **args)
+
+    # PEEK
+    if action == "peek":
         song = queue.peek()
-        return render_template(
-            "index.html",
-            queue_output=(str(song) if song else "Queue empty."),
-            active_section="queue-section"
-        )
-    elif action == "replay":
-        msg = queue.replay(history)
-        return render_template(
-            "index.html",
-            queue_output=msg,
-            active_section="queue-section"
-        )
+        args["queue_output_display"] = str(song) if song else "Queue empty."
+        args["queue_output"] = queue.display()
+        return render_template("index.html", **args)
 
+    # REPLAY
+    if action == "replay":
+        args["queue_output_display"] = queue.replay(history)
+        args["queue_output"] = queue.display()
+        args["queue_last_song"] = ""
+        return render_template("index.html", **args)
+
+    args["queue_output_display"] = "Invalid action."
+    return render_template("index.html", **args)
 
 @app.route("/queue/display", methods=["POST"])
 def queue_display():
     return render_template(
         "index.html",
-        queue_output=queue.display(),
-        active_section="queue-section"
+        active_section="queue-section",
+        queue_output=queue.display(),      # right box
+        queue_output_display="",           # left box stays untouched
+        queue_last_song=""
     )
-
-
 
 # ---------------------- HISTORY ----------------------
 @app.route("/history", methods=["POST"])
@@ -674,32 +734,33 @@ def history_action():
         if not song:
             return render_template(
                 "index.html",
+                active_section="history-section",
                 history_output="History empty.",
-                active_section="history-section"
             )
 
         queue.enqueue(song)
         return render_template(
             "index.html",
+            active_section="history-section",
             history_output=f"Restored to queue: {song.title}",
-            active_section="history-section"
         )
 
-    elif action == "clear":
+    if action == "clear":
         history.items.clear()
         return render_template(
             "index.html",
+            active_section="history-section",
             history_output="History cleared.",
-            active_section="history-section"
         )
 
 
 @app.route("/history/display", methods=["POST"])
 def history_display():
-   return render_template("index.html",
-                       history_output=history.display_list(),
-                       active_section="history-section")
-
+    return render_template(
+        "index.html",
+        active_section="history-section",
+        history_output=history.display_list(),
+    )
 
 
 import os
