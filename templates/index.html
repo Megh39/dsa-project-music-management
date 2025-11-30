@@ -179,11 +179,11 @@
             <button class="nav-btn {% if active_section=='playlist-section' %}active{% endif %}"
                 data-target="playlist-section">Playlist</button>
 
-                <button class="nav-btn {% if active_section=='queue-section' %}active{% endif %}"
-                    data-target="queue-section">Queue</button>
+            <button class="nav-btn {% if active_section=='queue-section' %}active{% endif %}"
+                data-target="queue-section">Queue</button>
 
-                    <button class="nav-btn {% if active_section=='history-section' %}active{% endif %}"
-                        data-target="history-section">Stack</button>
+            <button class="nav-btn {% if active_section=='history-section' %}active{% endif %}"
+                data-target="history-section">Stack</button>
 
         </aside>
 
@@ -260,7 +260,46 @@
                             </div>
                         </form>
 
-                        <div class="output">{{ playlist_output }}</div>
+                        <!-- <div class="output">{{ playlist_output }}</div> -->
+                    </div>
+                    <div class="card">
+                        <h3>Insert After</h3>
+
+                        <form method="POST" action="/playlist">
+                            <div class="form-group">
+                                <label>New Song ID</label>
+                                <input type="text" name="song_id" placeholder="Song to insert">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Target Song ID</label>
+                                <input type="text" name="target_id" placeholder="Insert after this">
+                            </div>
+
+                            <button class="btn btn-primary" name="action" value="insert_after">Insert After</button>
+                        </form>
+
+                        <!-- <div class="output">{{ playlist_output }}</div> -->
+                    </div>
+                    <div class="card">
+                        <h3>Reorder Playlist</h3>
+
+                        <form method="POST" action="/playlist">
+                            <div class="form-group">
+                                <label>Song ID</label>
+                                <input type="text" name="song_id" placeholder="Song to reorder">
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn btn-primary" name="action" value="move_up">Move Up</button>
+                                <button class="btn btn-outline" name="action" value="move_down">Move Down</button>
+                                <button class="btn btn-outline" name="action" value="reverse">Reverse Playlist</button>
+
+                            </div>
+                        </form>
+
+
+                        <!-- <div class="output">{{ playlist_output }}</div> -->
                     </div>
 
                     <div class="card">
@@ -300,6 +339,8 @@
                                 <button class="btn btn-primary" name="action" value="enqueue">Enqueue</button>
                                 <button class="btn btn-outline" name="action" value="dequeue">Play Next</button>
                                 <button class="btn btn-outline" name="action" value="peek">Peek</button>
+                                <button class="btn btn-outline" name="action" value="replay">Replay Last Song</button>
+
                             </div>
                         </form>
 

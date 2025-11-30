@@ -207,6 +207,76 @@ class LinkedList:
             out.append(str(current.song))
             current = current.next
         return "\n".join(out)
+    def insert_after(self, target_id, song):
+        current = self.head
+        while current and current.song.song_id != target_id:
+            current = current.next
+
+        if not current:
+            print("Target song not found.")
+            return False
+
+        new_node = Node(song)
+        new_node.next = current.next
+        current.next = new_node
+        print(f"Inserted {song.title} after {current.song.title}")
+        return True
+    def move_up(self, song_id):
+        if not self.head or not self.head.next:
+            return False
+
+        prev = None
+        curr = self.head
+
+        while curr and curr.song.song_id != song_id:
+            prev_prev = prev
+            prev = curr
+            curr = curr.next
+
+        if not curr or not prev:
+            return False
+
+        prev.next = curr.next
+        curr.next = prev
+
+        if prev_prev:
+            prev_prev.next = curr
+        else:
+            self.head = curr
+
+        return True
+    def move_down(self, song_id):
+        curr = self.head
+        prev = None
+
+        while curr and curr.song.song_id != song_id:
+            prev = curr
+            curr = curr.next
+
+        if not curr or not curr.next:
+            return False
+
+        nxt = curr.next
+        curr.next = nxt.next
+        nxt.next = curr
+
+        if prev:
+            prev.next = nxt
+        else:
+            self.head = nxt
+
+        return True
+    def reverse(self):
+        prev = None
+        current = self.head
+
+        while current:
+            nxt = current.next
+            current.next = prev
+            prev = current
+            current = nxt
+
+        self.head = prev
 
 
 # %%
@@ -256,7 +326,14 @@ class Queue:
         if partial: return partial[0]
 
         return None
+    def replay(self, stack):
+        song = stack.pop()
+        if not song:
+            return "No song to replay."
 
+        self.enqueue(song)
+        return f"Replaying: {song.title}"
+    
 
 # %%
 
@@ -288,6 +365,7 @@ class Stack:
         print("Recently Played:")
         for song in reversed(self.items):
             print(song)
+    
 
 
 
@@ -404,38 +482,94 @@ def library_display():
 # ---------------------- PLAYLIST ----------------------
 @app.route("/playlist", methods=["POST"])
 def playlist_action():
-    song_id = request.form.get("song_id")
     action = request.form.get("action")
+    song_id = request.form.get("song_id")
 
-    song = library.search(song_id)
-    if not song:
+    # reverse does NOT need a song
+    if action == "reverse":
+        playlist.reverse()
         return render_template(
             "index.html",
-            playlist_output="Song not found in library.",
+            playlist_output="Playlist reversed.",
             active_section="playlist-section"
         )
 
-    if action == "add_start":
-        playlist.insert_at_start(song)
+    # insert_after needs TWO IDs
+    if action == "insert_after":
+        target_id = request.form.get("target_id")
+        if not song_id or not target_id:
+            return render_template(
+                "index.html",
+                playlist_output="Both song_id and target_id required.",
+                active_section="playlist-section"
+            )
+
+        song = library.search(song_id)
+        target_song = library.search(target_id)
+
+        if not song or not target_song:
+            return render_template(
+                "index.html",
+                playlist_output="Song or target not found in library.",
+                active_section="playlist-section"
+            )
+
+        playlist.insert_after(target_id, song)
         return render_template(
             "index.html",
-            playlist_output="Inserted at start.",
+            playlist_output=f"Inserted {song.title} after {target_song.title}",
             active_section="playlist-section"
         )
 
-    elif action == "add_end":
-        playlist.insert_at_end(song)
+    # move_up and move_down need only song_id
+    if action in ["move_up", "move_down"]:
+        if not song_id:
+            return render_template(
+                "index.html",
+                playlist_output="Song ID required.",
+                active_section="playlist-section"
+            )
+
+        ok = playlist.move_up(song_id) if action == "move_up" else playlist.move_down(song_id)
+
         return render_template(
             "index.html",
-            playlist_output="Inserted at end.",
+            playlist_output="Success." if ok else "Cannot move.",
             active_section="playlist-section"
         )
 
-    elif action == "delete":
-        removed = playlist.delete_song(song_id)
+    # add_start, add_end, delete need song validation
+    if action in ["add_start", "add_end", "delete"]:
+        if not song_id:
+            return render_template(
+                "index.html",
+                playlist_output="Song ID required.",
+                active_section="playlist-section"
+            )
+
+        song = library.search(song_id)
+        if not song and action != "delete":
+            return render_template(
+                "index.html",
+                playlist_output="Song not found in library.",
+                active_section="playlist-section"
+            )
+
+        if action == "add_start":
+            playlist.insert_at_start(song)
+            msg = "Inserted at start."
+
+        elif action == "add_end":
+            playlist.insert_at_end(song)
+            msg = "Inserted at end."
+
+        elif action == "delete":
+            removed = playlist.delete_song(song_id)
+            msg = "Deleted." if removed else "Song not found."
+
         return render_template(
             "index.html",
-            playlist_output="Deleted." if removed else "Song not found.",
+            playlist_output=msg,
             active_section="playlist-section"
         )
 
@@ -511,6 +645,13 @@ def queue_action():
             queue_output=(str(song) if song else "Queue empty."),
             active_section="queue-section"
         )
+    elif action == "replay":
+        msg = queue.replay(history)
+        return render_template(
+            "index.html",
+            queue_output=msg,
+            active_section="queue-section"
+        )
 
 
 @app.route("/queue/display", methods=["POST"])
@@ -560,9 +701,6 @@ def history_display():
                        active_section="history-section")
 
 
-# ----------------------------------------------------
-if __name__ == "__main__":
-    app.run()
 
 import os
 
